@@ -325,6 +325,54 @@
         </table>
       </div>
     </section>
+
+    <section class="pc-card" id="proyeksi-sumber-dana">
+      <h2>Proyeksi per sumber dana: Kas dan BCA Purchasing</h2>
+      <p class="pc-desc">Berapa dana yang perlu disiapkan di masing-masing sumber. Tiap bulan dibagi memakai porsi Kas dan BCA pada bulan yang sama di 2026; kotak dan grafik memakai skenario Moderat.</p>
+      <div class="pc-tiles">
+        <div class="pc-tile">
+          <span class="lbl">Kas · proyeksi 2027</span>
+          <span class="big" data-draw="kpi" data-fmt="rp" data-source="c_bayar_skenario" data-field="kas_2027" data-where="skenario=Moderat">—</span>
+          <span class="sm"><span data-draw="kpi" data-fmt="rp" data-source="c_bayar_skenario" data-field="kas_per_bulan_2027" data-where="skenario=Moderat">—</span> per bulan · <span data-draw="kpi" data-fmt="pct" data-source="c_bayar_skenario" data-field="porsi_kas_2027" data-where="skenario=Moderat">—</span> dari total</span>
+        </div>
+        <div class="pc-tile">
+          <span class="lbl">Kas · bulan tersibuk 2027</span>
+          <span class="big" data-draw="kpi" data-fmt="rp" data-source="c_bayar_skenario" data-field="kas_puncak_2027" data-where="skenario=Moderat">—</span>
+          <span class="sm"><span data-draw="kpi" data-fmt="text" data-source="c_bayar_skenario" data-field="kas_bulan_puncak" data-where="skenario=Moderat">—</span></span>
+        </div>
+        <div class="pc-tile">
+          <span class="lbl">BCA Purchasing · proyeksi 2027</span>
+          <span class="big" data-draw="kpi" data-fmt="rp" data-source="c_bayar_skenario" data-field="bca_2027" data-where="skenario=Moderat">—</span>
+          <span class="sm"><span data-draw="kpi" data-fmt="rp" data-source="c_bayar_skenario" data-field="bca_per_bulan_2027" data-where="skenario=Moderat">—</span> per bulan</span>
+        </div>
+        <div class="pc-tile">
+          <span class="lbl">BCA Purchasing · bulan tersibuk 2027</span>
+          <span class="big" data-draw="kpi" data-fmt="rp" data-source="c_bayar_skenario" data-field="bca_puncak_2027" data-where="skenario=Moderat">—</span>
+          <span class="sm"><span data-draw="kpi" data-fmt="text" data-source="c_bayar_skenario" data-field="bca_bulan_puncak" data-where="skenario=Moderat">—</span></span>
+        </div>
+      </div>
+      <div class="pc-legend" style="margin-top: var(--cds-gap-md)">
+        <span><i class="pc-sw" data-color="4"></i>Kas</span>
+        <span><i class="pc-sw" data-color="5"></i>BCA Purchasing</span>
+        <span>Warna pudar = proyeksi</span>
+      </div>
+      <div class="pc-chart dash-skeleton" data-draw="chart-bayar" data-source="c_proyeksi_bayar"></div>
+      <h3 class="pc-desc" style="margin-top: var(--cds-gap-md)">Kas dan BCA per skenario</h3>
+      <div class="pc-scroll">
+        <table class="pc-tbl" data-source="c_bayar_skenario" data-row-key="skenario">
+          <thead><tr><th data-field="skenario">Skenario</th><th class="n" data-field="kas_2026">Kas 2026</th><th class="n" data-field="bca_2026">BCA 2026</th><th class="n" data-field="kas_2027">Kas 2027</th><th class="n" data-field="bca_2027">BCA 2027</th><th class="n" data-field="kas_per_bulan_2027">Kas / bulan 2027</th><th class="n" data-field="bca_per_bulan_2027">BCA / bulan 2027</th></tr></thead>
+          <tbody data-draw="tbl-bayar-skenario"></tbody>
+        </table>
+      </div>
+      <h3 class="pc-desc" style="margin-top: var(--cds-gap-md)">Kebutuhan dana 2027 per kuartal (Moderat)</h3>
+      <div class="pc-scroll">
+        <table class="pc-tbl" data-source="c_bayar_kuartal" data-row-key="kuartal">
+          <thead><tr><th data-field="kuartal">Kuartal</th><th class="n" data-field="kas">Kas</th><th class="n" data-field="bca">BCA Purchasing</th><th class="n" data-field="total">Total</th><th class="n" data-field="kas_per_bulan">Kas / bulan</th><th class="n" data-field="bca_per_bulan">BCA / bulan</th></tr></thead>
+          <tbody data-draw="tbl-bayar-kuartal"></tbody>
+        </table>
+      </div>
+      <p class="pc-desc" style="margin: var(--cds-gap-sm) 0 0">Bila rekomendasi memindahkan pembayaran pemasok rutin dari Kas ke transfer BCA dijalankan, porsi BCA akan naik dan porsi Kas turun dari angka di atas, dengan total yang sama.</p>
+    </section>
   </section>
 
   <section class="pc-card" id="semua-barang">
@@ -809,6 +857,106 @@ Versi file HTML dari Dashboard Purchasing · dibuat 6 November 2026 · data tida
     fillT(tb, rows, [['kuartal'], ['konservatif', pcRp, 'n'], ['moderat', pcRp, 'n'], ['efisien', pcRp, 'n'], ['moderat_onty1', pcRp, 'n'], ['moderat_onty2', pcRp, 'n']]);
   });
   document.querySelectorAll('.pc-sw[data-skenario]').forEach((s) => { s.style.background = dash.colors[Number(s.dataset.skenario)]; });
+
+  // ---------- Proyeksi per sumber dana ----------
+  dash.calc('c_proyeksi_bayar', {
+    inputs: ['belanja', 'c_proyeksi', 'c_barang', 'c_ringkas'],
+    title: 'Proyeksi per sumber dana',
+    description: 'Proyeksi tiap bulan dibagi ke Kas dan BCA Purchasing memakai porsi bulan yang sama di 2026; penghematan dibagi menurut porsi tiap sumber pada barang besar.',
+    fn: (belanja, c_proyeksi, c_barang, c_ringkas) => {
+      const kas = {}, all = {};
+      for (const r of belanja) {
+        const m = Number(r.bulan_ke), v = Number(r.nilai_rp);
+        all[m] = (all[m] || 0) + v;
+        if (r.pembayaran === 'Kas') kas[m] = (kas[m] || 0) + v;
+      }
+      const bln = Object.keys(all).map(Number);
+      const porsiKasRata = bln.reduce((s, m) => s + (kas[m] || 0), 0) / bln.reduce((s, m) => s + all[m], 0);
+      const porsiKas = (m) => (all[m] ? (kas[m] || 0) / all[m] : porsiKasRata);
+      const besar = c_barang.slice(0, c_ringkas[0].barang_80);
+      const kasBesar = besar.filter((r) => r.pembayaran === 'Kas').reduce((s, r) => s + r.total, 0) / besar.reduce((s, r) => s + r.total, 0);
+      return c_proyeksi.map((r) => {
+        const kotorKas = r.nilai_tanpa_hemat * porsiKas(r.bulan_ke), hemat = r.nilai_tanpa_hemat - r.nilai;
+        const k = r.jenis === 'Aktual' ? kas[r.bulan_ke] || 0 : kotorKas - hemat * kasBesar;
+        return {skenario: r.skenario, tahun: r.tahun, bulan_ke: r.bulan_ke, bulan: r.bulan, jenis: r.jenis, kas: k, bca: r.nilai - k, total: r.nilai};
+      });
+    },
+  });
+
+  dash.calc('c_bayar_skenario', {
+    inputs: ['c_proyeksi_bayar'],
+    title: 'Kas dan BCA per skenario',
+    description: 'Total dan rata-rata per bulan dana Kas dan BCA Purchasing untuk 2026 dan 2027 tiap skenario.',
+    fn: (c_proyeksi_bayar) => ['Konservatif', 'Moderat', 'Efisien'].map((skenario) => {
+      const r = c_proyeksi_bayar.filter((x) => x.skenario === skenario);
+      const t = (th, f) => r.filter((x) => x.tahun === th).reduce((s, x) => s + x[f], 0);
+      const y27 = r.filter((x) => x.tahun === 2027);
+      const pk = y27.reduce((p, x) => (x.kas > p.kas ? x : p)), pb = y27.reduce((p, x) => (x.bca > p.bca ? x : p));
+      return {skenario, kas_2026: t(2026, 'kas'), bca_2026: t(2026, 'bca'), kas_2027: t(2027, 'kas'), bca_2027: t(2027, 'bca'),
+        kas_per_bulan_2027: t(2027, 'kas') / 12, bca_per_bulan_2027: t(2027, 'bca') / 12,
+        kas_puncak_2027: pk.kas, kas_bulan_puncak: pk.bulan, bca_puncak_2027: pb.bca, bca_bulan_puncak: pb.bulan,
+        porsi_kas_2027: t(2027, 'kas') / t(2027, 'total')};
+    }),
+  });
+
+  dash.calc('c_bayar_kuartal', {
+    inputs: ['c_proyeksi_bayar'],
+    title: 'Kas dan BCA 2027 per kuartal',
+    description: 'Kebutuhan dana Kas dan BCA Purchasing per kuartal 2027, skenario Moderat.',
+    fn: (c_proyeksi_bayar) => [1, 2, 3, 4].map((k) => {
+      const r = c_proyeksi_bayar.filter((x) => x.skenario === 'Moderat' && x.tahun === 2027 && Math.ceil(x.bulan_ke / 3) === k);
+      const kas = r.reduce((s, x) => s + x.kas, 0), bca = r.reduce((s, x) => s + x.bca, 0);
+      return {kuartal: `K${k} 2027`, kas, bca, total: kas + bca, kas_per_bulan: kas / 3, bca_per_bulan: bca / 3};
+    }),
+  });
+
+  dash.draw('chart-bayar', (el) => {
+    const all = pcState(el, 'c_proyeksi_bayar');
+    if (!all) return;
+    el.replaceChildren();
+    const rows = all.filter((r) => r.skenario === 'Moderat');
+    const W = Math.max(320, el.clientWidth), H = 300, mb = 30;
+    const y = d3.scaleLinear([0, d3.max(rows, (r) => r.total) * 1.05], [H - mb, 10]).nice();
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('display', 'block');
+    const probe = svg.append('text').attr('font-size', 12).text(pcAxis(y.domain()[1]));
+    const ml = probe.node().getComputedTextLength() + 10; probe.remove();
+    const key = (r) => `${r.tahun}-${r.bulan_ke}`;
+    const x = d3.scaleBand(rows.map(key), [ml, W - 6]).paddingInner(0.2);
+    const ticks = y.ticks(5);
+    svg.append('g').selectAll('line').data(ticks).join('line').attr('x1', ml).attr('x2', W - 6).attr('y1', y).attr('y2', y).attr('stroke', 'var(--cds-chart-grid)');
+    svg.append('g').selectAll('text').data(ticks).join('text').attr('x', ml - 8).attr('y', (d) => y(d) + 4).attr('text-anchor', 'end').attr('font-size', 12).attr('fill', 'var(--color-fg-muted)').text(pcAxis);
+    const every = W < 640 ? 3 : 1;
+    svg.append('g').selectAll('text').data(rows.filter((r, i) => i % every === 0)).join('text').attr('x', (r) => x(key(r)) + x.bandwidth() / 2).attr('y', H - 14).attr('text-anchor', 'middle').attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text((r) => r.bulan.slice(0, 3));
+    svg.append('g').selectAll('text').data(rows.filter((r) => r.bulan_ke === 1)).join('text').attr('x', (r) => x(key(r))).attr('y', H - 1).attr('font-size', 11).attr('font-weight', 600).attr('fill', 'var(--color-fg-muted)').text((r) => r.tahun);
+    const bw = Math.min(28, x.bandwidth()), off = (x.bandwidth() - bw) / 2;
+    const g = svg.append('g').selectAll('g').data(rows).join('g').attr('opacity', (r) => (r.jenis === 'Aktual' ? 1 : 0.62));
+    g.append('rect').attr('x', (r) => x(key(r)) + off).attr('width', bw).attr('y', (r) => y(r.kas)).attr('height', (r) => y(0) - y(r.kas)).attr('fill', dash.colors[4]);
+    g.append('rect').attr('x', (r) => x(key(r)) + off).attr('width', bw).attr('y', (r) => y(r.total)).attr('height', (r) => y(r.kas) - y(r.total)).attr('rx', 2).attr('fill', dash.colors[5]);
+    const batas = rows.find((r) => r.jenis === 'Proyeksi');
+    if (batas) svg.append('line').attr('x1', x(key(batas)) - x.step() * 0.1).attr('x2', x(key(batas)) - x.step() * 0.1).attr('y1', 10).attr('y2', H - mb).attr('stroke', 'var(--cds-chart-axis)').attr('stroke-dasharray', '4 4');
+    svg.append('line').attr('x1', ml).attr('x2', W - 6).attr('y1', y(0)).attr('y2', y(0)).attr('stroke', 'var(--cds-chart-axis)');
+    const tip = d3.select(el).append('div').attr('class', 'pc-tip').style('display', 'none');
+    svg.append('g').selectAll('rect').data(rows).join('rect').attr('x', (r) => x(key(r))).attr('width', x.step()).attr('y', 0).attr('height', H - mb).attr('fill', 'transparent')
+      .on('mousemove', (ev, r) => {
+        g.attr('opacity', (o) => (o === r ? 1 : 0.35));
+        tip.style('display', null).selectAll('*').remove();
+        tip.append('div').attr('class', 't').text(`${r.bulan} ${r.tahun} · ${r.jenis}`);
+        [['Kas', r.kas, 4], ['BCA Purchasing', r.bca, 5]].forEach(([n, v, i]) => { const l = tip.append('div'); l.append('i').attr('class', 'pc-sw').style('background', dash.colors[i]).style('margin-right', '6px'); l.append('span').text(`${n}: ${pcRp(v)}`); });
+        tip.append('div').style('margin-top', '2px').text(`Total: ${pcRp(r.total)}`);
+        const [px, py] = d3.pointer(ev, el), tw = tip.node().offsetWidth;
+        tip.style('left', Math.min(Math.max(0, px + 12), el.clientWidth - tw) + 'px').style('top', Math.max(0, py - 80) + 'px');
+      })
+      .on('mouseleave', () => { g.attr('opacity', (r) => (r.jenis === 'Aktual' ? 1 : 0.62)); tip.style('display', 'none'); });
+  });
+
+  dash.draw('tbl-bayar-skenario', (tb) => {
+    const rows = pcState(tb, 'c_bayar_skenario'); if (!rows) return;
+    fillT(tb, rows, [['skenario'], ['kas_2026', pcRp, 'n'], ['bca_2026', pcRp, 'n'], ['kas_2027', pcRp, 'n'], ['bca_2027', pcRp, 'n'], ['kas_per_bulan_2027', pcRp, 'n'], ['bca_per_bulan_2027', pcRp, 'n']]);
+  });
+  dash.draw('tbl-bayar-kuartal', (tb) => {
+    const rows = pcState(tb, 'c_bayar_kuartal'); if (!rows) return;
+    fillT(tb, rows, [['kuartal'], ['kas', pcRp, 'n'], ['bca', pcRp, 'n'], ['total', pcRp, 'n'], ['kas_per_bulan', pcRp, 'n'], ['bca_per_bulan', pcRp, 'n']]);
+  });
 
 </script>
 <script>window.__runAll();</script>
